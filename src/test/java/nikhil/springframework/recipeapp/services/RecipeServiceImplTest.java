@@ -1,13 +1,15 @@
 package nikhil.springframework.recipeapp.services;
 
+import nikhil.springframework.recipeapp.converters.RecipeCommandToRecipe;
+import nikhil.springframework.recipeapp.converters.RecipeToRecipeCommand;
 import nikhil.springframework.recipeapp.domain.Recipe;
 import nikhil.springframework.recipeapp.repositories.RecipeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
-import java.lang.management.OperatingSystemMXBean;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -22,11 +24,17 @@ class RecipeServiceImplTest {
     @Mock
     RecipeRepository recipeRepository;
 
+    @Mock
+    RecipeToRecipeCommand recipeToRecipeCommand;
+
+    @Mock
+    RecipeCommandToRecipe recipeCommandToRecipe;
+
     @BeforeEach
     public void setUp(){
         MockitoAnnotations.initMocks(this);
 
-        recipeService = new RecipeServiceImpl(recipeRepository);
+        recipeService = new RecipeServiceImpl(recipeRepository, recipeCommandToRecipe, recipeToRecipeCommand);
     }
 
     @Test

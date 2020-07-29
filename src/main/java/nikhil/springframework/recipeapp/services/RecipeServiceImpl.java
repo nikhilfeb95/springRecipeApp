@@ -1,6 +1,9 @@
 package nikhil.springframework.recipeapp.services;
 
 import lombok.extern.slf4j.Slf4j;
+import nikhil.springframework.recipeapp.commands.RecipeCommand;
+import nikhil.springframework.recipeapp.converters.RecipeCommandToRecipe;
+import nikhil.springframework.recipeapp.converters.RecipeToRecipeCommand;
 import nikhil.springframework.recipeapp.domain.Recipe;
 import nikhil.springframework.recipeapp.repositories.RecipeRepository;
 import org.springframework.stereotype.Service;
@@ -14,9 +17,13 @@ import java.util.Set;
 public class RecipeServiceImpl implements RecipeService{
 
     private final RecipeRepository recipeRepository;
+    private final RecipeCommandToRecipe recipeCommandToRecipe;
+    private final RecipeToRecipeCommand recipeToRecipeCommand;
 
-    public RecipeServiceImpl(RecipeRepository recipeRepository) {
+    public RecipeServiceImpl(RecipeRepository recipeRepository, RecipeCommandToRecipe recipeCommandToRecipe, RecipeToRecipeCommand recipeToRecipeCommand) {
         this.recipeRepository = recipeRepository;
+        this.recipeCommandToRecipe = recipeCommandToRecipe;
+        this.recipeToRecipeCommand = recipeToRecipeCommand;
     }
 
     @Override
@@ -35,5 +42,22 @@ public class RecipeServiceImpl implements RecipeService{
         if(!optionalRecipe.isPresent())
             throw new RuntimeException("Recipe not Found");
         return optionalRecipe.get();
+    }
+
+    @Override
+    public RecipeCommand findCommandById(Long id) {
+        Recipe detached = recipeRepository.findById(id).orElse(null);
+        if(detached == null)
+            throw new RuntimeException("Recipe with Id doesn't exist");
+        return recipeToRecipeCommand.convert(detached);
+    }
+
+    @Override
+    public RecipeCommand saveRecipeCommand(RecipeCommand recipeCommand) {
+        Recipe detachedRecipe = recipeCommandToRecipe.convert(recipeCommand);
+
+        Recipe savedRecipe = recipeRepository.save(detachedRecipe);
+        log.debug("Saved recipe id :"+ savedRecipe.getId());
+        return recipeToRecipeCommand.convert(savedRecipe);
     }
 }
