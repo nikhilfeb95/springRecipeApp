@@ -6,6 +6,7 @@ import nikhil.springframework.recipeapp.repositories.RecipeRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -25,5 +26,14 @@ public class RecipeServiceImpl implements RecipeService{
         //::(double colon) operator acts as a lambda-> refers the class method directly
         recipeRepository.findAll().iterator().forEachRemaining(recipeSet::add);
         return recipeSet;
+    }
+
+    @Override
+    public Recipe findById(Long l) {
+        Optional<Recipe> optionalRecipe= recipeRepository.findById(l);
+
+        if(!optionalRecipe.isPresent())
+            throw new RuntimeException("Recipe not Found");
+        return optionalRecipe.get();
     }
 }
