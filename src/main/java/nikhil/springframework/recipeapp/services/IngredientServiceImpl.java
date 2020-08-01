@@ -10,6 +10,7 @@ import nikhil.springframework.recipeapp.repositories.RecipeRepository;
 import nikhil.springframework.recipeapp.repositories.UnitOfMeasureRepository;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
 import java.util.Optional;
 
@@ -111,5 +112,36 @@ public class IngredientServiceImpl implements IngredientService{
         return ingredientToIngredientCommand.convert(savedIngredientOptional.get());
     }
 
+    @Override
+    public void DeleteById(Long recipeId, Long ingredientId) {
+        log.debug("In the delete method");
 
+        Optional<Recipe> recipeOptional = recipeRepository.findById(recipeId);
+
+        if(recipeOptional.isPresent())
+        {
+            log.debug("Recipe with id : " + recipeId + "exists");
+            Recipe recipe = recipeOptional.get();
+
+            Optional<Ingredient> optionalIngredient = recipe.getIngredients().stream()
+                    .filter(ingredient -> ingredient.getId().equals(ingredientId))
+                    .findFirst();
+
+            if(optionalIngredient.isPresent())
+            {
+                Ingredient ingredientToDelete = optionalIngredient.get();
+                ingredientToDelete.setRecipe(null);
+                recipe.getIngredients().remove(ingredientToDelete);
+
+                //update db with the new value
+                recipeRepository.save(recipe);
+            }
+            else{
+                log.debug("Ingredient with id not found");
+            }
+        }
+        else{
+            log.debug("Recipe with id " + recipeId + "doesn't exist");
+        }
+    }
 }

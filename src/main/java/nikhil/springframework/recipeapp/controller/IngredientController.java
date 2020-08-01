@@ -4,14 +4,16 @@ import lombok.extern.slf4j.Slf4j;
 import nikhil.springframework.recipeapp.commands.IngredientCommand;
 import nikhil.springframework.recipeapp.commands.RecipeCommand;
 import nikhil.springframework.recipeapp.commands.UnitOfMeasureCommand;
+import nikhil.springframework.recipeapp.domain.Ingredient;
 import nikhil.springframework.recipeapp.domain.Recipe;
-import nikhil.springframework.recipeapp.domain.UnitOfMeasure;
 import nikhil.springframework.recipeapp.services.IngredientService;
 import nikhil.springframework.recipeapp.services.RecipeService;
 import nikhil.springframework.recipeapp.services.UnitOfMeasureService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @Slf4j
 @Controller
@@ -73,6 +75,14 @@ public class IngredientController {
         return "recipe/ingredient/ingredientForm";
     }
 
+    @GetMapping
+    @RequestMapping("/recipe/{recipeId}/ingredients/{ingredientId}/delete")
+    public String Delete(@PathVariable String recipeId, @PathVariable String ingredientId){
+
+        ingredientService.DeleteById(Long.valueOf(recipeId), Long.valueOf(ingredientId));
+
+        return "redirect:/recipe/" + recipeId + "/ingredients";
+    }
 
     //Save the binded object here --> this route is called on form action
     //the form returns a IngredientCommand
@@ -91,6 +101,5 @@ public class IngredientController {
         log.debug("saved ingredient id:" + savedCommand.getId());
 
         return "redirect:/recipe/" + savedCommand.getRecipeId() + "/ingredients/" + savedCommand.getId() + "/show";
-
     }
 }
