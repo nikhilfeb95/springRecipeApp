@@ -72,20 +72,4 @@ public class RecipeController {
 
         return modelAndView;
     }
-
-    //handle 400 errors
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(NumberFormatException.class)
-    public ModelAndView handleNumberFormatException(Exception ex)
-    {
-        log.error("Unrecognised id on find");
-        log.error(ex.getMessage());
-
-        ModelAndView modelAndView = new ModelAndView();
-
-        modelAndView.setViewName("400error");
-        modelAndView.addObject("exception", ex);
-
-        return modelAndView;
-    }
 }

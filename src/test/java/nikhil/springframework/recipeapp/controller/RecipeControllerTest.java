@@ -34,7 +34,9 @@ class RecipeControllerTest {
     MockMvc mvc;
     @BeforeEach
     void setUp() {
-        mvc= MockMvcBuilders.standaloneSetup(recipeController).build();
+        mvc= MockMvcBuilders.standaloneSetup(recipeController)
+                .setControllerAdvice(new ControllerExceptionHandler())
+                .build();
     }
 
     @Test
@@ -73,4 +75,13 @@ class RecipeControllerTest {
 
         verify(recipeService,times(1)).deleteById(anyLong());
     }
+
+    @Test
+    public void testBadRequest() throws Exception
+    {
+        mvc.perform(get("/recipe/asdf/show"))
+                .andExpect(status().isBadRequest())
+                .andExpect(view().name("400error"));
+    }
+
 }
