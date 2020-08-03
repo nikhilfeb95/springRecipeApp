@@ -2,10 +2,14 @@ package nikhil.springframework.recipeapp.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import nikhil.springframework.recipeapp.commands.RecipeCommand;
+import nikhil.springframework.recipeapp.exceptions.NotFoundException;
 import nikhil.springframework.recipeapp.services.RecipeService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
 
 @Slf4j
 @Controller
@@ -54,5 +58,34 @@ public class RecipeController {
 
         recipeService.deleteById(Long.valueOf(id));
         return "redirect:/";
+    }
+
+    //Route handles all 404 errors
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundException.class)
+    public ModelAndView handleNotFound(Exception ex){
+        log.error("Handling not found exception");
+        log.error(ex.getMessage());
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("404error");
+        modelAndView.addObject("exception", ex);
+
+        return modelAndView;
+    }
+
+    //handle 400 errors
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(NumberFormatException.class)
+    public ModelAndView handleNumberFormatException(Exception ex)
+    {
+        log.error("Unrecognised id on find");
+        log.error(ex.getMessage());
+
+        ModelAndView modelAndView = new ModelAndView();
+
+        modelAndView.setViewName("400error");
+        modelAndView.addObject("exception", ex);
+
+        return modelAndView;
     }
 }
