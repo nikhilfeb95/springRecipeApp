@@ -7,14 +7,19 @@ import nikhil.springframework.recipeapp.services.RecipeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.thymeleaf.model.IModel;
+
+import javax.validation.Valid;
 
 
 @Slf4j
 @Controller
 public class RecipeController {
     private final RecipeService recipeService;
+    private static final String RECIPE_RECIPEFORM_URL = "recipe/recipeform";
 
     public RecipeController(RecipeService recipeService) {
         this.recipeService = recipeService;
@@ -33,13 +38,22 @@ public class RecipeController {
     public String newRecipe(Model model){
         model.addAttribute("recipe", new RecipeCommand());
 
-        return "recipe/recipeform";
+        return RECIPE_RECIPEFORM_URL;
     }
 
     @PostMapping("recipe")
-    public String saveOrUpdate(@ModelAttribute RecipeCommand command){
-        RecipeCommand savedCommand = recipeService.saveRecipeCommand(command);
+    public String saveOrUpdate(@Valid @ModelAttribute RecipeCommand command, BindingResult bindingResult,
+                              Model model){
 
+        if(bindingResult.hasErrors())
+        {
+            bindingResult.getAllErrors().forEach(objectError -> {
+                log.debug(objectError.toString());
+            });
+            model.addAttribute("recipe",command);
+            return RECIPE_RECIPEFORM_URL;
+        }
+        RecipeCommand savedCommand = recipeService.saveRecipeCommand(command);
         return "redirect:/recipe/" + savedCommand.getId() + "/show";
     }
 
@@ -48,7 +62,7 @@ public class RecipeController {
         RecipeCommand saveCommand = recipeService.findCommandById(Long.valueOf(id));
         model.addAttribute("recipe", saveCommand);
 
-        return "recipe/recipeform";
+        return RECIPE_RECIPEFORM_URL;
     }
 
     @RequestMapping("/recipe/{id}/delete")

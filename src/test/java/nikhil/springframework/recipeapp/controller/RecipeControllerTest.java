@@ -62,7 +62,9 @@ class RecipeControllerTest {
         mvc.perform(post("/recipe")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("id", "")
-                .param("description", "some string"))
+                .param("description", "some string")
+                .param("directions","some directions")
+                .param("url","https://www.example.com"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/recipe/2/show"));
     }
